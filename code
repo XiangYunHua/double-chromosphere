@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    ul,
+    div {
+        display: flex;
+    }
+
+    li {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 1px solid;
+        text-align: center;
+        line-height: 50px;
+        list-style: none;
+        color: rgb(48, 28, 28);
+        background-color: red;
+    }
+
+    p {
+        font-size: 20px;
+        margin-top: 30px;
+        margin-left: 30px;
+    }
+
+    #luck {
+
+        background-color: blue;
+
+    }
+</style>
+
+<body>
+    <div>
+        <h1>中奖号码</h1>
+        <ul id='luckyUl'></ul>
+    </div>
+    <!-- 机选 -->
+    <div>
+        <h1>机选号码</h1>
+        <ul id='computerUl'></ul>
+    </div>
+    <div>
+        <h1>中奖结果</h1>
+        <p id="p"></p>
+
+    </div>
+    <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script>
+        class CreatBall {
+            constructor(node, Rcolor, Bcolor) {
+                this.node = node
+                this.Rcolor = Rcolor
+                this.Bcolor = Bcolor
+            }
+
+            creat() {
+                // 生成6个红球
+                let s = new Set()
+                while (s.size < 6) {
+                    s.add(_.random(1, 33))
+                }
+                let arr = [...s];
+
+                //    排序 转数组  
+                arr = _.orderBy(arr)
+                // 篮球
+                let number = _.random(1, 17)
+                this.node.innerHTML = arr.map(item => `
+                <li style='background-color:${this.Rcolor}'>${item}</li>
+                `).join('')
+                this.node.innerHTML += ` <li style='background-color:${this.Bcolor}'>${number}</li>`
+                // 将 随机出来的红蓝球return出去
+                return [arr, number]
+            }
+
+        }
+        setInterval(function () {
+            let computerBall = new CreatBall(luckyUl, 'red', 'blue')
+            let [computerRedBalls, computerBlueBall] = computerBall.creat()
+            let luckyBall = new CreatBall(computerUl, 'red', 'blue')
+
+            let [luckyRedBalls, luckyBlueBall] = luckyBall.creat()
+            //  这里用到了 lodash里的 两个数组 取交集方法   _.intersection
+            let count = _.intersection(computerRedBalls, luckyRedBalls).length// 中奖的红球个数
+            // 三目运算  如果机选篮球和 中奖篮球相等 
+            let state = luckyBlueBall == computerBlueBall ? true : false;
+            if (count == 6 && state) {
+                p.innerHTML = '钱(ni)太(zhong)多(bu)了，也封顶¥500万?'
+
+            } else if (count == 6) {
+                p.innerHTML = '钱(ni)太(zhong)多(bu)了，也封顶¥500万?'
+            } else if (count == 5 && state) {
+                p.innerHTML = '100元'
+            } else if (count == 5 || count == 4 && state) {
+                p.innerHTML = '15元'
+            } else if (count == 4 || count == 3 && state) {
+                p.innerHTML = '10元'
+            } else if ((count == 2 && state) || (count == 1 && state) || (state)) {
+                p.innerHTML = '5元'
+            } else if ((count == 2) || (count == 1 && state) || (state)) {
+                p.innerHTML = '2元'
+            }
+            else {
+                p.innerHTML = '一个没中'
+            }
+        }, 500)
+
+
+
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
